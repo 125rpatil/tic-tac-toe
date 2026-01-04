@@ -45,28 +45,38 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("playing",(e)=>{
-        if(e.value=="X"){
-            let objToChange=playingArray.find(obj=>obj.p1.p1name===e.name)
+    socket.on("playing", (e) => {
+        const game = playingArray.find(
+            obj =>
+                obj.p1.p1name === e.name ||
+                obj.p2.p2name === e.name
+        );
+        if (!game) return;
 
-            objToChange.p1.p1move=e.id
-            objToChange.sum++
+        const isXTurn = game.sum % 2 === 1;
+
+        if (isXTurn && e.value !== "X") return;
+        if (!isXTurn && e.value !== "O") return;
+
+        if (e.value === "X" && game.p1.p1name === e.name) {
+            game.p1.p1move = e.id;
         }
-        if(e.value=="O"){
-            let objToChange=playingArray.find(obj=>obj.p2.p2name===e.name)
-
-            objToChange.p2.p2move=e.id
-            objToChange.sum++
+        else if (e.value === "O" && game.p2.p2name === e.name) {
+            game.p2.p2move = e.id;
+        }
+        else {
+            return;
         }
 
-        io.emit("playing",{allPlayers:playingArray})
-    })
+        game.sum++;
+
+        io.emit("playing", { allPlayers: playingArray });
+    });
+
     socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);
 
-
         arr = arr.filter(name => name !== socket.name);
-
 
         playingArray = playingArray.filter(game =>
             game.p1.socketId !== socket.id &&

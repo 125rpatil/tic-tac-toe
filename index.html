@@ -116,7 +116,6 @@
     document.querySelectorAll(".btn").forEach(e => {
         e.addEventListener("click", function(){
             let value=document.getElementById("value").innerText;
-            e.innerText=value;
 
             socket.emit("playing",{value:value, id:e.id,name:name});
 
