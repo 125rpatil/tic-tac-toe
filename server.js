@@ -22,12 +22,14 @@ io.on("connection", (socket) => {
                 let p1obj={
                     p1name:arr[0],
                     p1value:"X",
-                    p1move:""
+                    p1move:"",
+                    socketId:socket.id
                 }
                 let p2obj={
                     p2name:arr[1],
                     p2value:"O",
-                    p2move:""
+                    p2move:"",
+                    socketId:socket.id
                 }
                 let obj ={
                     p1:p1obj,
@@ -59,6 +61,18 @@ io.on("connection", (socket) => {
 
         io.emit("playing",{allPlayers:playingArray})
     })
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+
+
+        arr = arr.filter(name => name !== socket.name);
+
+
+        playingArray = playingArray.filter(game =>
+            game.p1.socketId !== socket.id &&
+            game.p2.socketId !== socket.id
+        );
+    });
 })
 
 app.get("/", (req, res) => {
